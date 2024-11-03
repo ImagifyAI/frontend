@@ -1,18 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-
-const fetchWithAuth = async (url, options = {}) => {
-  // Let Cloudflare Access handle the cookie automatically
-  const defaultOptions = {
-    credentials: 'include',
-    headers: {
-      ...options.headers,
-    }
-  };
-
-  const response = await fetch(url, { ...defaultOptions, ...options });
-  return response;
-};
 
 const ImageGallery = () => {
   const [images, setImages] = useState([]);
@@ -21,12 +8,14 @@ const ImageGallery = () => {
   const [uploadStatus, setUploadStatus] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
-  const fetchImages = useCallback(async () => {
+  const fetchImages = async () => {
     try {
       setLoading(true);
       console.log('Starting fetchImages');
 
-      const response = await fetchWithAuth('https://backend.lokesh.cloud/api/images');
+      const response = await fetch('https://backend.lokesh.cloud/api/images', {
+        credentials: 'include'  
+      });
 
       console.log('Response status:', response.status);
       if (!response.ok) throw new Error(`Failed to fetch images: ${response.status}`);
@@ -40,36 +29,28 @@ const ImageGallery = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    const initializeUser = async () => {
+    const initialize = async () => {
       try {
-        console.log('Initializing user...');
-        const response = await fetch('/cdn-cgi/access/get-identity', {
-          credentials: 'include'
-        });
-        console.log('Identity response:', response.status);
-
-        if (!response.ok) throw new Error('Failed to get user identity');
-
+        const response = await fetch('/cdn-cgi/access/get-identity');
         const data = await response.json();
-        console.log('User data:', data);
-
+        console.log('Identity data:', data);
+        
         setUserInfo({
           email: data.email,
-          id: data.id // Using id instead of sub for Azure AD
+          id: data.email
         });
-
-        await fetchImages();
+        fetchImages();
       } catch (err) {
-        console.error('Initialization error:', err);
-        setError('Failed to initialize: ' + err.message);
+        console.error('Failed to get identity:', err);
+        setError('Failed to authenticate');
       }
     };
 
-    initializeUser();
-  }, [fetchImages]);
+    initialize();
+  }, []); 
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
@@ -78,11 +59,12 @@ const ImageGallery = () => {
     try {
       setUploadStatus('uploading');
 
-      const response = await fetchWithAuth('https://backend.lokesh.cloud/api/upload', {
+      const response = await fetch('https://backend.lokesh.cloud/api/upload', {
         method: 'POST',
         headers: {
           'Content-Type': file.type,
         },
+        credentials: 'include', 
         body: file
       });
 
@@ -100,6 +82,7 @@ const ImageGallery = () => {
       console.error('Upload error:', err);
     }
   };
+
 
   return (
     <div className="gallery-container">
