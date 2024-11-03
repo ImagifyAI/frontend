@@ -37,12 +37,12 @@ const ImageGallery = () => {
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
+  
     try {
       setUploadStatus('uploading');
-
+  
       await fetch('/cdn-cgi/access/get-identity'); 
-
+  
       const response = await fetch('https://backend.lokesh.cloud/api/upload', {
         method: 'POST',
         headers: {
@@ -51,13 +51,19 @@ const ImageGallery = () => {
         credentials: 'include',
         body: file
       });
-
+  
+      if (!response.ok) throw new Error(`Failed to upload: ${response.status}`);
+  
+      const responseData = await response.json();
+      console.log('Upload success:', responseData);
+      setUploadStatus('success');
     } catch (err) {
       setUploadStatus('error');
       setError(err.message);
       console.error('Upload error:', err);
     }
   };
+  
 
   useEffect(() => {
     const initialize = async () => {
