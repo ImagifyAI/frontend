@@ -36,19 +36,19 @@ const ImageUploader = () => {
             setUploadStatus("Please select an image first");
             return;
         }
-        setUploadStatus("Uploading...");
-    
+        setUploadStatus("Uploading");
+
         try {
             const buffer = await file.arrayBuffer();
-    
-            const response = await fetch("/api/upload", { 
+
+            const response = await fetch("https://images.lokesh.cloud/api/upload", {
                 method: "POST",
                 headers: {
                     "Content-Type": file.type
                 },
                 body: buffer
             });
-    
+
             if (response.ok) {
                 setUploadStatus("Image uploaded successfully");
                 loadUserImages();
