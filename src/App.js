@@ -15,7 +15,11 @@ const ImageGallery = () => {
         throw new Error('Failed to get identity token');
       }
       const data = await response.json();
-      return data.token;
+      console.log('Identity data:', {
+        ...data,
+        jwt: data.jwt ? 'present' : 'missing' 
+      });
+      return data.jwt; 
     } catch (err) {
       console.error('Failed to get access token:', err);
       throw err;
