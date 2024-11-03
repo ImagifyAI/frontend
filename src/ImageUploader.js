@@ -7,7 +7,7 @@ const ImageUploader = () => {
 
     const loadUserImages = async () => {
         try {
-            const response = await fetch("/api/images");
+            const response = await fetch("https://backend.lokesh.cloud/api/images");
             if (response.ok) {
                 const data = await response.json();
                 setImages(data.images);
@@ -30,7 +30,7 @@ const ImageUploader = () => {
         try {
             const buffer = await file.arrayBuffer();
 
-            const response = await fetch("/api/upload", {
+            const response = await fetch("https://backend.lokesh.cloud/api/upload", {
                 method: "POST",
                 headers: {
                     "Content-Type": file.type
