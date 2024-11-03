@@ -33,7 +33,7 @@ const ImageGallery = () => {
     } finally {
       setLoading(false);
     }
-  }, [authToken]); 
+  }, [authToken]);
 
   useEffect(() => {
     const initialize = async () => {
@@ -46,9 +46,9 @@ const ImageGallery = () => {
           email: data.email,
           id: data.email
         });
-        setAuthToken(data.token); 
+        setAuthToken(data.jwt);
         
-        if (data.token) {
+        if (data.jwt) {  
           fetchImages();
         }
       } catch (err) {
@@ -58,7 +58,7 @@ const ImageGallery = () => {
     };
 
     initialize();
-  }, [fetchImages]); 
+  }, [fetchImages]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
