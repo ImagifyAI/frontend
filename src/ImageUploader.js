@@ -1,16 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ImageUploader.css';
 
 const ImageUploader = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(true);  
     const [images, setImages] = useState([]);
     const [uploadStatus, setUploadStatus] = useState("");
 
     const loadUserImages = async () => {
-        const response = await fetch("/api/images");
-        if (response.ok) {
-            const data = await response.json();
-            setImages(data.images);
+        try {
+            const response = await fetch("/api/images");
+            if (response.ok) {
+                const data = await response.json();
+                setImages(data.images);
+            }
+        } catch (error) {
+            console.error("Error loading images:", error);
         }
     };
 
@@ -44,6 +48,12 @@ const ImageUploader = () => {
             setUploadStatus(`Error: ${error.message}`);
         }
     };
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            loadUserImages();
+        }
+    }, [isAuthenticated]);
 
     return (
         <div className="container">
