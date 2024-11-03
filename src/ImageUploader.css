@@ -1,12 +1,10 @@
-/* src/ImageUploader.css */
-
 * {
     box-sizing: border-box;
   }
   
   body {
     margin: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: Arial, sans-serif;
     background-color: #f7f7f7;
     color: #333;
   }
@@ -52,24 +50,24 @@
     color: #333;
   }
   
-  .file-input {
-    display: none;
-  }
-  
-  .upload-button {
-    padding: 12px 24px;
-    margin-top: 10px;
+  .file-input-label {
+    display: inline-block;
+    padding: 10px 20px;
     font-size: 16px;
     color: #fff;
     background-color: #28a745;
-    border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin-top: 10px;
   }
   
-  .upload-button:hover {
+  .file-input-label:hover {
     background-color: #218838;
+  }
+  
+  .file-input {
+    display: none;
   }
   
   .upload-status {
