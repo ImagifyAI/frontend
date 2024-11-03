@@ -12,28 +12,28 @@ const ImageGallery = () => {
   const fetchImages = async () => {
     try {
       setLoading(true);
-      console.log('Starting fetchImages');
   
-      // Retrieve Cloudflare Access identity to ensure token is available
-      await fetch('/cdn-cgi/access/get-identity');
+      const token = document.cookie.split('; ').find(row => row.startsWith('CF_Authorization='));
+      if (!token) {
+        console.error('CF_Authorization token is missing');
+        throw new Error('Authorization token is missing');
+      }
+      
+      const authToken = token.split('=')[1];
+      console.log('Sending token:', authToken);
+  
       const response = await fetch('https://backend.lokesh.cloud/api/images', {
         credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${document.cookie
-            .split('; ')
-            .find(row => row.startsWith('CF_Authorization='))
-            ?.split('=')[1]}`
+          'Authorization': `Bearer ${authToken}`
         }
       });
   
-      console.log('Response status:', response.status);
       if (!response.ok) throw new Error(`Failed to fetch images: ${response.status}`);
   
       const data = await response.json();
-      console.log('Received data:', data);
       setImages(data.images || []);
     } catch (err) {
-      console.error('FetchImages error:', err);
       setError('Failed to load images: ' + err.message);
     } finally {
       setLoading(false);
