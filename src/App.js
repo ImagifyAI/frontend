@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
+const fetchWithAuth = async (url, options = {}) => {
+  // Let Cloudflare Access handle the cookie automatically
+  const defaultOptions = {
+    credentials: 'include',
+    headers: {
+      ...options.headers,
+    }
+  };
+
+  const response = await fetch(url, { ...defaultOptions, ...options });
+  return response;
+};
+
 const ImageGallery = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -8,38 +21,12 @@ const ImageGallery = () => {
   const [uploadStatus, setUploadStatus] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
 
-  const getAccessToken = async () => {
-    try {
-      const response = await fetch('/cdn-cgi/access/get-identity');
-      if (!response.ok) {
-        throw new Error('Failed to get identity token');
-      }
-      const data = await response.json();
-      console.log('Identity data:', {
-        ...data,
-        jwt: data.jwt ? 'present' : 'missing' 
-      });
-      return data.jwt; 
-    } catch (err) {
-      console.error('Failed to get access token:', err);
-      throw err;
-    }
-  };
-
   const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Starting fetchImages');
 
-      const token = await getAccessToken();
-      console.log('Got identity token');
-
-      const response = await fetch('https://backend.lokesh.cloud/api/images', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        credentials: 'include'
-      });
+      const response = await fetchWithAuth('https://backend.lokesh.cloud/api/images');
 
       console.log('Response status:', response.status);
       if (!response.ok) throw new Error(`Failed to fetch images: ${response.status}`);
@@ -59,7 +46,9 @@ const ImageGallery = () => {
     const initializeUser = async () => {
       try {
         console.log('Initializing user...');
-        const response = await fetch('/cdn-cgi/access/get-identity');
+        const response = await fetch('/cdn-cgi/access/get-identity', {
+          credentials: 'include'
+        });
         console.log('Identity response:', response.status);
 
         if (!response.ok) throw new Error('Failed to get user identity');
@@ -69,7 +58,7 @@ const ImageGallery = () => {
 
         setUserInfo({
           email: data.email,
-          id: data.sub || data.email
+          id: data.id // Using id instead of sub for Azure AD
         });
 
         await fetchImages();
@@ -88,16 +77,13 @@ const ImageGallery = () => {
 
     try {
       setUploadStatus('uploading');
-      const token = await getAccessToken();
 
-      const response = await fetch('https://backend.lokesh.cloud/api/upload', {
+      const response = await fetchWithAuth('https://backend.lokesh.cloud/api/upload', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': file.type,
         },
-        body: file,
-        credentials: 'include'
+        body: file
       });
 
       if (!response.ok) {
