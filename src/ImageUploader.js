@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ImageUploader.css';
 
 const ImageUploader = () => {
-    const [isAuthenticated, setIsAuthenticated] = useState(true);  
+    const [isAuthenticated] = useState(true); 
     const [images, setImages] = useState([]);
     const [uploadStatus, setUploadStatus] = useState("");
 
