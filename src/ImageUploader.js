@@ -6,10 +6,6 @@ const ImageUploader = () => {
     const [images, setImages] = useState([]);
     const [uploadStatus, setUploadStatus] = useState("");
 
-    useEffect(() => {
-        checkAuthentication();
-    }, [checkAuthentication]);
-
     const loadUserImages = async () => {
         const response = await fetch("/api/images");
         if (response.ok) {
