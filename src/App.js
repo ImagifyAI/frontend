@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 
 const ImageGallery = () => {
@@ -9,7 +9,7 @@ const ImageGallery = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [authToken, setAuthToken] = useState(null);
 
-  const fetchImages = async () => {
+  const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
       console.log('Starting fetchImages');
@@ -33,7 +33,7 @@ const ImageGallery = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [authToken]); 
 
   useEffect(() => {
     const initialize = async () => {
@@ -58,7 +58,7 @@ const ImageGallery = () => {
     };
 
     initialize();
-  }, []); 
+  }, [fetchImages]); 
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
