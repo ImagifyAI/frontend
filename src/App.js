@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 const ImageGallery = () => {
@@ -9,13 +9,15 @@ const ImageGallery = () => {
   const [userInfo, setUserInfo] = useState(null);
 
 
-  const fetchImages = useCallback(async () => {
+  const fetchImages = async () => {
     try {
       setLoading(true);
       console.log('Starting fetchImages');
 
+      await fetch('/cdn-cgi/access/get-identity');
+      
       const response = await fetch('https://backend.lokesh.cloud/api/images', {
-        credentials: 'include'  
+        credentials: 'include',
       });
 
       console.log('Response status:', response.status);
@@ -30,7 +32,32 @@ const ImageGallery = () => {
     } finally {
       setLoading(false);
     }
-  }, []); 
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadStatus('uploading');
+
+      await fetch('/cdn-cgi/access/get-identity'); 
+
+      const response = await fetch('https://backend.lokesh.cloud/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': file.type,
+        },
+        credentials: 'include',
+        body: file
+      });
+
+    } catch (err) {
+      setUploadStatus('error');
+      setError(err.message);
+      console.error('Upload error:', err);
+    }
+  };
 
   useEffect(() => {
     const initialize = async () => {
@@ -52,39 +79,7 @@ const ImageGallery = () => {
     };
 
     initialize();
-  }, [fetchImages]);
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      setUploadStatus('uploading');
-
-      const response = await fetch('https://backend.lokesh.cloud/api/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': file.type,
-        },
-        credentials: 'include',  
-        body: file
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error || 'Upload failed');
-      }
-
-      setUploadStatus('success');
-      await fetchImages();
-      setTimeout(() => setUploadStatus(null), 3000);
-    } catch (err) {
-      setUploadStatus('error');
-      setError(err.message);
-      console.error('Upload error:', err);
-    }
-  };
-
+  }, []);
 
   return (
     <div className="gallery-container">
