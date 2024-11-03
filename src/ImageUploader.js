@@ -37,20 +37,27 @@ const ImageUploader = () => {
             return;
         }
         setUploadStatus("Uploading...");
-
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("https://images.lokesh.cloud/api/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (response.ok) {
-            setUploadStatus("Image uploaded successfully");
-            loadUserImages();
-        } else {
-            setUploadStatus("Image upload failed");
+    
+        try {
+            const buffer = await file.arrayBuffer();
+    
+            const response = await fetch("/api/upload", { 
+                method: "POST",
+                headers: {
+                    "Content-Type": file.type
+                },
+                body: buffer
+            });
+    
+            if (response.ok) {
+                setUploadStatus("Image uploaded successfully");
+                loadUserImages();
+            } else {
+                const errorText = await response.text();
+                setUploadStatus(`Image upload failed: ${errorText}`);
+            }
+        } catch (error) {
+            setUploadStatus(`Error: ${error.message}`);
         }
     };
 
