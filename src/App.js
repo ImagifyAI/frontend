@@ -9,26 +9,27 @@ const ImageGallery = () => {
   const [userInfo, setUserInfo] = useState(null);
 
   const getAccessToken = async () => {
-    return new Promise((resolve) => {
-      const checkToken = () => {
-        if (window.location.href.includes('token=')) {
-          const urlParams = new URLSearchParams(window.location.search);
-          resolve(urlParams.get('token'));
-        }
-        else if (window.CF_ACCESS_TOKEN) {
-          resolve(window.CF_ACCESS_TOKEN);
-        } else {
-          setTimeout(checkToken, 100);
-        }
-      };
-      checkToken();
-    });
+    try {
+      const response = await fetch('/cdn-cgi/access/get-identity');
+      if (!response.ok) {
+        throw new Error('Failed to get identity token');
+      }
+      const data = await response.json();
+      return data.token;
+    } catch (err) {
+      console.error('Failed to get access token:', err);
+      throw err;
+    }
   };
 
   const fetchImages = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('Starting fetchImages');
+
       const token = await getAccessToken();
+      console.log('Got identity token');
+
       const response = await fetch('https://backend.lokesh.cloud/api/images', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -36,13 +37,15 @@ const ImageGallery = () => {
         credentials: 'include'
       });
 
-      if (!response.ok) throw new Error('Failed to fetch images');
+      console.log('Response status:', response.status);
+      if (!response.ok) throw new Error(`Failed to fetch images: ${response.status}`);
 
       const data = await response.json();
-      setImages(data.images);
+      console.log('Received data:', data);
+      setImages(data.images || []);
     } catch (err) {
-      setError('Failed to load images');
-      console.error(err);
+      console.error('FetchImages error:', err);
+      setError('Failed to load images: ' + err.message);
     } finally {
       setLoading(false);
     }
@@ -69,14 +72,30 @@ const ImageGallery = () => {
 
   useEffect(() => {
     const initializeUser = async () => {
-      const user = await getUserInfo();
-      if (user) {
-        fetchImages();
+      try {
+        console.log('Initializing user...');
+        const response = await fetch('/cdn-cgi/access/get-identity');
+        console.log('Identity response:', response.status);
+
+        if (!response.ok) throw new Error('Failed to get user identity');
+
+        const data = await response.json();
+        console.log('User data:', data);
+
+        setUserInfo({
+          email: data.email,
+          id: data.sub || data.email
+        });
+
+        await fetchImages();
+      } catch (err) {
+        console.error('Initialization error:', err);
+        setError('Failed to initialize: ' + err.message);
       }
     };
 
     initializeUser();
-  }, [getUserInfo, fetchImages]);
+  }, [fetchImages]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files?.[0];
@@ -96,15 +115,18 @@ const ImageGallery = () => {
         credentials: 'include'
       });
 
-      if (!response.ok) throw new Error('Upload failed');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || 'Upload failed');
+      }
 
       setUploadStatus('success');
-      fetchImages();
+      await fetchImages();
       setTimeout(() => setUploadStatus(null), 3000);
     } catch (err) {
       setUploadStatus('error');
-      setError('Failed to upload image');
-      console.error(err);
+      setError(err.message);
+      console.error('Upload error:', err);
     }
   };
 
