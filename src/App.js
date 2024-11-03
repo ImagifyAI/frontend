@@ -7,7 +7,7 @@ const ImageGallery = () => {
   const [error, setError] = useState(null);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
+
 
   const fetchImages = useCallback(async () => {
     try {
@@ -15,10 +15,7 @@ const ImageGallery = () => {
       console.log('Starting fetchImages');
 
       const response = await fetch('https://backend.lokesh.cloud/api/images', {
-        credentials: 'include',
-        headers: {
-          'Authorization': `Bearer ${authToken}` 
-        }
+        credentials: 'include'  
       });
 
       console.log('Response status:', response.status);
@@ -33,7 +30,7 @@ const ImageGallery = () => {
     } finally {
       setLoading(false);
     }
-  }, [authToken]);
+  }, []); 
 
   useEffect(() => {
     const initialize = async () => {
@@ -46,11 +43,8 @@ const ImageGallery = () => {
           email: data.email,
           id: data.email
         });
-        setAuthToken(data.jwt);
         
-        if (data.jwt) {  
-          fetchImages();
-        }
+        fetchImages();
       } catch (err) {
         console.error('Failed to get identity:', err);
         setError('Failed to authenticate');
@@ -71,9 +65,8 @@ const ImageGallery = () => {
         method: 'POST',
         headers: {
           'Content-Type': file.type,
-          'Authorization': `Bearer ${authToken}` 
         },
-        credentials: 'include',
+        credentials: 'include',  
         body: file
       });
 
