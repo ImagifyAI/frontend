@@ -13,16 +13,22 @@ const ImageGallery = () => {
     try {
       setLoading(true);
       console.log('Starting fetchImages');
-
+  
+      // Retrieve Cloudflare Access identity to ensure token is available
       await fetch('/cdn-cgi/access/get-identity');
-      
       const response = await fetch('https://backend.lokesh.cloud/api/images', {
         credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${document.cookie
+            .split('; ')
+            .find(row => row.startsWith('CF_Authorization='))
+            ?.split('=')[1]}`
+        }
       });
-
+  
       console.log('Response status:', response.status);
       if (!response.ok) throw new Error(`Failed to fetch images: ${response.status}`);
-
+  
       const data = await response.json();
       console.log('Received data:', data);
       setImages(data.images || []);
@@ -41,12 +47,16 @@ const ImageGallery = () => {
     try {
       setUploadStatus('uploading');
   
-      await fetch('/cdn-cgi/access/get-identity'); 
+      await fetch('/cdn-cgi/access/get-identity');
   
       const response = await fetch('https://backend.lokesh.cloud/api/upload', {
         method: 'POST',
         headers: {
           'Content-Type': file.type,
+          'Authorization': `Bearer ${document.cookie
+            .split('; ')
+            .find(row => row.startsWith('CF_Authorization='))
+            ?.split('=')[1]}`
         },
         credentials: 'include',
         body: file
