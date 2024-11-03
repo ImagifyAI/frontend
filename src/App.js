@@ -51,25 +51,6 @@ const ImageGallery = () => {
     }
   }, []);
 
-  const getUserInfo = useCallback(async () => {
-    try {
-      const response = await fetch('/cdn-cgi/access/get-identity');
-      if (!response.ok) throw new Error('Failed to get user identity');
-      const data = await response.json();
-
-      setUserInfo({
-        email: data.email,
-        id: data.sub || data.email
-      });
-
-      return data;
-    } catch (err) {
-      console.error('Failed to get user identity:', err);
-      setError('Authentication failed');
-      return null;
-    }
-  }, []);
-
   useEffect(() => {
     const initializeUser = async () => {
       try {
