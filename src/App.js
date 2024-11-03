@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+
 const ImageGallery = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
