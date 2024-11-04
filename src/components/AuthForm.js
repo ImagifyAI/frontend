@@ -7,7 +7,7 @@ const FormContainer = styled.div`
   /* Styles */
 `;
 
-const AuthForm = ({ title, isLogin }) => {
+const AuthForm = ({ title, isLogin, onLogin }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
@@ -15,15 +15,14 @@ const AuthForm = ({ title, isLogin }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null); // Clear any previous error
+        setError(null); 
 
         try {
             const response = await login(email, password);
 
-            // Check if login was successful
             if (response.data.success) {
-                localStorage.setItem("token", response.data.token);
-                navigate("/"); // Redirect to the homepage
+                onLogin(response.data.token); 
+                navigate("/"); 
             } else {
                 setError("Invalid email or password");
             }
