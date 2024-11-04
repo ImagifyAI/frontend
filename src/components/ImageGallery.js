@@ -43,7 +43,7 @@ const ImageGallery = ({ token }) => {
                 {images.map((image) => (
                     <img
                         key={image.id}
-                        src={`https://your-r2-bucket-url/${image.filename}`}
+                        src={`/api/images/${image.filename}`} 
                         alt="Uploaded"
                         style={{ borderRadius: "8px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
                     />
