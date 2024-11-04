@@ -17,7 +17,6 @@ const ImageGallery = ({ token }) => {
         const fetchImages = async () => {
             try {
                 const response = await getImages(token);
-
                 if (response.data.success && Array.isArray(response.data.images)) {
                     setImages(response.data.images);
                 } else {
@@ -43,9 +42,9 @@ const ImageGallery = ({ token }) => {
                 {images.map((image) => (
                     <img
                         key={image.id}
-                        src={`/api/images/${image.filename}`} 
+                        src={image.data} 
                         alt="Uploaded"
-                        style={{ borderRadius: "8px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)" }}
+                        style={{ borderRadius: "8px", boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", maxWidth: "100%" }} 
                     />
                 ))}
             </GalleryGrid>
