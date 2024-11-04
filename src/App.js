@@ -11,7 +11,6 @@ function App() {
     const [token, setToken] = useState(null);
 
     useEffect(() => {
-        // Load token from localStorage on app load
         const savedToken = localStorage.getItem("token");
         if (savedToken) {
             setToken(savedToken);
@@ -39,7 +38,7 @@ function App() {
                     <Route path="/register" element={<AuthForm title="Register" />} />
                     <Route
                         path="/upload"
-                        element={token ? <ImageUpload token={token} onUpload={() => window.location.reload()} /> : <Navigate to="/login" />}
+                        element={token ? <ImageUpload token={token} /> : <Navigate to="/login" />}
                     />
                     <Route
                         path="/gallery"
