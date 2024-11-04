@@ -11,18 +11,30 @@ const GalleryGrid = styled.div`
 
 const ImageGallery = ({ token }) => {
     const [images, setImages] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchImages = async () => {
             try {
                 const response = await getImages(token);
-                setImages(response.data.images);
+
+                if (response.data.success && Array.isArray(response.data.images)) {
+                    setImages(response.data.images);
+                } else {
+                    setError("Failed to load images.");
+                }
             } catch (error) {
                 console.error("Failed to load images:", error);
+                setError("An error occurred while fetching images.");
             }
         };
+
         fetchImages();
     }, [token]);
+
+    if (error) {
+        return <p style={{ color: "red" }}>{error}</p>;
+    }
 
     return (
         <div>
