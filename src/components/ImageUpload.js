@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { uploadImage } from "../api";
 
-const ImageUpload = ({ token, onUpload }) => {
+const ImageUpload = ({ token }) => {
     const [file, setFile] = useState(null);
     const [statusMessage, setStatusMessage] = useState("");
 
@@ -22,7 +22,6 @@ const ImageUpload = ({ token, onUpload }) => {
 
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully!");
-                onUpload();
             } else {
                 setStatusMessage("Image upload failed. Please try again.");
             }
