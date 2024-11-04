@@ -3,17 +3,32 @@ import { uploadImage } from "../api";
 
 const ImageUpload = ({ token, onUpload }) => {
     const [file, setFile] = useState(null);
+    const [statusMessage, setStatusMessage] = useState("");
 
     const handleUpload = async (e) => {
         e.preventDefault();
-        if (!file) return;
+        setStatusMessage(""); 
+
+        if (!file) {
+            setStatusMessage("Please select a file to upload.");
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append("image", file);
-            await uploadImage(token, formData.get("image"));
-            onUpload();
+
+            const response = await uploadImage(token, formData.get("image"));
+
+            if (response.data.success) {
+                setStatusMessage("Image uploaded successfully!");
+                onUpload();
+            } else {
+                setStatusMessage("Image upload failed. Please try again.");
+            }
         } catch (error) {
             console.error("Upload failed:", error);
+            setStatusMessage("An error occurred during upload. Please try again.");
         }
     };
 
@@ -24,6 +39,7 @@ const ImageUpload = ({ token, onUpload }) => {
                 <input type="file" onChange={(e) => setFile(e.target.files[0])} />
                 <button type="submit">Upload</button>
             </form>
+            {statusMessage && <p style={{ color: statusMessage.includes("success") ? "green" : "red" }}>{statusMessage}</p>}
         </div>
     );
 };
