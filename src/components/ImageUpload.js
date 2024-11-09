@@ -21,6 +21,8 @@ const ImageUpload = ({ token }) => {
             formData.append("image", file);
     
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
+            console.log("Decoded Token:", decodedToken);  
+            
             const userId = decodedToken.sub;  
     
             if (!userId) {
