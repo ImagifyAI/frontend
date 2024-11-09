@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import AuthForm from "./components/AuthForm";
@@ -9,6 +9,7 @@ import GlobalStyles from "./styles/GlobalStyles";
 
 function App() {
     const [token, setToken] = useState(null);
+    const navigate = useNavigate(); 
 
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
@@ -25,10 +26,11 @@ function App() {
     const handleLogout = () => {
         localStorage.removeItem("token");
         setToken(null);
+        navigate("/"); 
     };
 
     return (
-        <Router>
+        <div>
             <GlobalStyles />
             <Navbar token={token} onLogout={handleLogout} />
             <div className="container">
@@ -46,7 +48,7 @@ function App() {
                     />
                 </Routes>
             </div>
-        </Router>
+        </div>
     );
 }
 
