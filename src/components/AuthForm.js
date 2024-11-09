@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { register } from "../api";
+import { register, login } from "../api"; 
 import Turnstile from "react-turnstile"; 
 
 const FormContainer = styled.div`
@@ -30,7 +30,10 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         console.log("Turnstile Token:", turnstileToken); 
     
         try {
-            const response = await register(email, password, headers);
+            const response = isLogin 
+                ? await login(email, password, headers) 
+                : await register(email, password, headers);
+
             console.log("Backend response:", response.data); 
             if (response.data.success) {
                 onLogin();
@@ -39,8 +42,13 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                 setError(response.data.error || "Authentication failed");
             }
         } catch (error) {
-            console.error("Registration error:", error); 
-            setError("Registration failed");
+            if (error.response && error.response.data) {
+                console.error("Backend responded with an error:", error.response.data);
+                setError(error.response.data.error || "Authentication failed");
+            } else {
+                console.error("Error during submission:", error);
+                setError("Submission failed");
+            }
         }
     };    
 
