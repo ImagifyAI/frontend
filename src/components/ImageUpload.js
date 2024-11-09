@@ -18,18 +18,19 @@ const ImageUpload = ({ token }) => {
     
         try {
             const formData = new FormData();
-            formData.append("image", file);
-    
+            formData.append("image", file);  
+
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
-            const userId = decodedToken.sub;  
+            const userId = decodedToken.sub; 
     
-            formData.append("userId", userId); 
+            formData.append("userId", userId);  
     
-            const response = await uploadImage(token, formData);
-    
+            const response = await uploadImage(formData);
+
+            // Handle response
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
-                setTags(response.data.tags); 
+                setTags(response.data.tags);  
             } else {
                 setStatusMessage("Image upload failed");
             }
@@ -37,8 +38,7 @@ const ImageUpload = ({ token }) => {
             console.error("Upload failed:", error);
             setStatusMessage("An error occurred during upload");
         }
-    };       
-    
+    };
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
