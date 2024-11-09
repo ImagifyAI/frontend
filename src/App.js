@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Route, Routes, Navigate, useNavigate } from "react-router-dom";
+import { Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./components/HomePage";
 import AuthForm from "./components/AuthForm";
@@ -9,7 +9,7 @@ import GlobalStyles from "./styles/GlobalStyles";
 
 function App() {
     const [token, setToken] = useState(null);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
