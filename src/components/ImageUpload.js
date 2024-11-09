@@ -9,8 +9,8 @@ const ImageUpload = ({ token }) => {
     const handleUpload = async (e) => {
         e.preventDefault();
         setStatusMessage("");
-        setTags([]);
-    
+        setTags([]); 
+        
         if (!file) {
             setStatusMessage("Please select a file to upload");
             return;
@@ -21,13 +21,16 @@ const ImageUpload = ({ token }) => {
             formData.append("image", file);
     
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
-            const userId = decodedToken.sub;  
+            const userId = decodedToken.sub;
     
             if (!userId) {
                 setStatusMessage("User ID missing or invalid in token");
                 return;
             }
     
+            formData.append("userId", userId);
+    
+            // Log FormData content before sending to the backend
             console.log("FormData content before upload:");
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}: ${value}`);
