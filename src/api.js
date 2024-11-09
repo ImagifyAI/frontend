@@ -21,6 +21,7 @@ export const uploadImage = (token, image) => {
     });
 };
 
+
 export const getImages = (token) => 
     axios.get(`${API_URL}/images`, {
         headers: { Authorization: `Bearer ${token}` },
