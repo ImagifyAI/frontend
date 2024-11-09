@@ -19,13 +19,14 @@ const Modal = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: auto;
   z-index: 1000;
 `;
 
 const ModalContent = styled.div`
   position: relative;
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 90vw;
+  max-height: 90vh;
   background: white;
   padding: 20px;
   border-radius: 8px;
@@ -33,12 +34,13 @@ const ModalContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 `;
 
 const FullImage = styled.img`
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;  // Ensures the image scales proportionally
+  object-fit: contain;  
   border-radius: 8px;
 `;
 
