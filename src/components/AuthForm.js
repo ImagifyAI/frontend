@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { login, register } from "../api";
+import { register } from "../api";
 import Turnstile from "react-turnstile"; 
 
 const FormContainer = styled.div`
