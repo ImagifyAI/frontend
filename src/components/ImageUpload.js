@@ -9,7 +9,7 @@ const ImageUpload = ({ token }) => {
     const handleUpload = async (e) => {
         e.preventDefault();
         setStatusMessage("");
-        setTags([]); 
+        setTags([]);
     
         if (!file) {
             setStatusMessage("Please select a file to upload");
@@ -47,6 +47,7 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
+    
     
 
     return (
