@@ -30,8 +30,10 @@ const ImageUpload = ({ token }) => {
     
             formData.append("userId", userId);  
     
-            console.log("FormData content:", formData);
-
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ": " + pair[1]); 
+            }
+    
             const response = await uploadImage(token, formData);
     
             if (response.data.success) {
@@ -45,6 +47,7 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
+    
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
