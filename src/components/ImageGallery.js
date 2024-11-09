@@ -9,9 +9,57 @@ const GalleryGrid = styled.div`
   padding-top: 20px;
 `;
 
+const Modal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+`;
+
+const FullImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 8px;
+`;
+
+const DownloadButton = styled.button`
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+  &:hover {
+    opacity: 1;
+  }
+`;
+
 const ImageGallery = ({ token }) => {
     const [images, setImages] = useState([]);
     const [error, setError] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         const fetchImages = async () => {
@@ -31,6 +79,10 @@ const ImageGallery = ({ token }) => {
         fetchImages();
     }, [token]);
 
+    const handleImageClick = (image) => {
+        setSelectedImage(image); 
+    };
+
     const handleDownload = (imageData, filename) => {
         const link = document.createElement("a");
         link.href = imageData;
@@ -38,6 +90,10 @@ const ImageGallery = ({ token }) => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const closeModal = () => {
+        setSelectedImage(null);
     };
 
     if (error) {
@@ -49,42 +105,32 @@ const ImageGallery = ({ token }) => {
             <h2>Your Gallery</h2>
             <GalleryGrid>
                 {images.map((image) => (
-                    <div key={image.id} style={{ position: "relative", cursor: "pointer" }}>
-                        <img
-                            src={image.data}
-                            alt="Uploaded"
-                            onClick={() => handleDownload(image.data, image.filename)}
-                            style={{
-                                borderRadius: "8px",
-                                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                                maxWidth: "100%",
-                                transition: "transform 0.2s",
-                            }}
-                        />
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDownload(image.data, image.filename);
-                            }}
-                            style={{
-                                position: "absolute",
-                                bottom: "10px",
-                                right: "10px",
-                                background: "#007bff",
-                                color: "white",
-                                border: "none",
-                                padding: "6px 10px",
-                                borderRadius: "4px",
-                                cursor: "pointer",
-                                fontSize: "12px",
-                                opacity: "0.8",
-                            }}
-                        >
-                            Download
-                        </button>
-                    </div>
+                    <img
+                        key={image.id}
+                        src={image.data}
+                        alt="Uploaded"
+                        onClick={() => handleImageClick(image)}
+                        style={{
+                            borderRadius: "8px",
+                            boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                            maxWidth: "100%",
+                            cursor: "pointer",
+                            transition: "transform 0.2s",
+                        }}
+                    />
                 ))}
             </GalleryGrid>
+
+            {selectedImage && (
+                <Modal onClick={closeModal}>
+                    <ModalContent onClick={(e) => e.stopPropagation()}>
+                        <FullImage src={selectedImage.data} alt="Expanded" />
+                        <DownloadButton onClick={() => handleDownload(selectedImage.data, selectedImage.filename)}>
+                            Download
+                        </DownloadButton>
+                    </ModalContent>
+                </Modal>
+            )}
         </div>
     );
 };
