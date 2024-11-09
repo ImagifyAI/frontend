@@ -28,10 +28,9 @@ const ImageUpload = ({ token }) => {
                 return;
             }
     
-            formData.append("userId", userId);  
-    
-            for (let pair of formData.entries()) {
-                console.log(pair[0] + ": " + pair[1]); 
+            console.log("FormData content before upload:");
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
             }
     
             const response = await uploadImage(token, formData);
