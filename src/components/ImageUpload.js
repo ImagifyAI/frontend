@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { uploadImage } from "../api";
+import { uploadImage } from "../api";  
 
 const ImageUpload = ({ token }) => {
     const [file, setFile] = useState(null);
@@ -15,11 +15,11 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("Please select a file to upload");
             return;
         }
-    
+
         try {
             const formData = new FormData();
             formData.append("image", file);
-    
+            
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
             const userId = decodedToken.sub;
     
@@ -29,14 +29,13 @@ const ImageUpload = ({ token }) => {
             }
     
             formData.append("userId", userId);
-    
-            // Log FormData content before sending to the backend
+
             console.log("FormData content before upload:");
             for (let [key, value] of formData.entries()) {
-                console.log(`${key}: ${value}`);
+                console.log(`${key}:`, value);
             }
     
-            const response = await uploadImage(token, formData);
+            const response = await uploadImage(formData);  
     
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
@@ -49,8 +48,6 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
-    
-    
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
