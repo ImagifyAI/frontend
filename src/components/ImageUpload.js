@@ -9,27 +9,34 @@ const ImageUpload = ({ token }) => {
     const handleUpload = async (e) => {
         e.preventDefault();
         setStatusMessage("");
-        setTags([]);
-
+        setTags([]); 
+    
         if (!file) {
             setStatusMessage("Please select a file to upload");
             return;
         }
-
+    
         try {
             const formData = new FormData();
-            formData.append("image", file); 
-
+            formData.append("image", file);
+    
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
             const userId = decodedToken.sub;  
-
-            formData.append("userId", userId); 
-
+    
+            if (!userId) {
+                setStatusMessage("User ID missing or invalid in token");
+                return;
+            }
+    
+            formData.append("userId", userId);  
+    
+            console.log("Decoded userId:", userId);
+    
             const response = await uploadImage(token, formData);
-
+    
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
-                setTags(response.data.tags); 
+                setTags(response.data.tags);  
             } else {
                 setStatusMessage("Image upload failed");
             }
@@ -38,6 +45,7 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
+    
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
