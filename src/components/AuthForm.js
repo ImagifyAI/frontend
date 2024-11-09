@@ -27,6 +27,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         }
     
         const headers = { 'Turnstile-Token': turnstileToken };
+        console.log(turnstileToken);
         try {
             const response = await register(email, password, headers);
             if (response.data.success) {
