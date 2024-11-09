@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { register, login } from "../api"; 
+import { register, login } from "../api";
 import Turnstile from "react-turnstile"; 
 
 const FormContainer = styled.div`
   /* Styles */
 `;
 
-const AuthForm = ({ title, isLogin, onLogin }) => {
+const AuthForm = ({ title, isLogin, onLogin = () => {} }) => {  
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
@@ -36,7 +36,9 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
 
             console.log("Backend response:", response.data); 
             if (response.data.success) {
-                onLogin();
+                if (typeof onLogin === "function") { 
+                    onLogin();
+                }
                 navigate("/"); 
             } else {
                 setError(response.data.error || "Authentication failed");
