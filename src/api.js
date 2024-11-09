@@ -2,8 +2,8 @@ import axios from "axios";
 
 const API_URL = "https://backend.lokesh.cloud/api";
 
-export const register = (email, password) => 
-    axios.post(`${API_URL}/register`, { email, password });
+export const register = (email, password, headers = {}) => 
+    axios.post(`${API_URL}/register`, { email, password }, { headers });
 
 export const login = (email, password) => 
     axios.post(`${API_URL}/login`, { email, password });
