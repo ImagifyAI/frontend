@@ -30,11 +30,15 @@ const ModalContent = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const FullImage = styled.img`
   max-width: 100%;
   max-height: 100%;
+  object-fit: contain;  // Ensures the image scales proportionally
   border-radius: 8px;
 `;
 
@@ -89,7 +93,7 @@ const ImageGallery = ({ token }) => {
         link.download = filename;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
+        document.body.removeChild(link); 
     };
 
     const closeModal = () => {
