@@ -4,13 +4,15 @@ import { uploadImage } from "../api";
 const ImageUpload = ({ token }) => {
     const [file, setFile] = useState(null);
     const [statusMessage, setStatusMessage] = useState("");
+    const [tags, setTags] = useState([]); 
 
     const handleUpload = async (e) => {
         e.preventDefault();
-        setStatusMessage(""); 
+        setStatusMessage("");
+        setTags([]); 
 
         if (!file) {
-            setStatusMessage("Please select a file to upload.");
+            setStatusMessage("Please select a file to upload");
             return;
         }
 
@@ -21,13 +23,14 @@ const ImageUpload = ({ token }) => {
             const response = await uploadImage(token, formData.get("image"));
 
             if (response.data.success) {
-                setStatusMessage("Image uploaded successfully!");
+                setStatusMessage("Image uploaded successfully");
+                setTags(response.data.tags); 
             } else {
-                setStatusMessage("Image upload failed. Please try again.");
+                setStatusMessage("Image upload failed");
             }
         } catch (error) {
             console.error("Upload failed:", error);
-            setStatusMessage("An error occurred during upload. Please try again.");
+            setStatusMessage("An error occurred during upload");
         }
     };
 
@@ -39,6 +42,12 @@ const ImageUpload = ({ token }) => {
                 <button type="submit">Upload</button>
             </form>
             {statusMessage && <p style={{ color: statusMessage.includes("success") ? "green" : "red" }}>{statusMessage}</p>}
+            {tags.length > 0 && (
+                <div>
+                    <h3>Generated Tags:</h3>
+                    <p>{tags.join(", ")}</p>
+                </div>
+            )}
         </div>
     );
 };
