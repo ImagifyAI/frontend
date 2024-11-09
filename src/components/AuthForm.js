@@ -25,17 +25,20 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
             setError("Please complete the captcha.");
             return;
         }
-
-        const headers = { 'Content-Type': 'application/json', 'Turnstile-Token': turnstileToken };
-        const response = await (isLogin ? login : register)({ email, password }, headers);
-
-        if (response.success) {
-            onLogin();
-            navigate("/"); 
-        } else {
-            setError(response.error || "Authentication failed");
+    
+        const headers = { 'Turnstile-Token': turnstileToken };
+        try {
+            const response = await register(email, password, headers);
+            if (response.data.success) {
+                onLogin();
+                navigate("/"); 
+            } else {
+                setError(response.data.error || "Authentication failed");
+            }
+        } catch (error) {
+            setError("Registration failed");
         }
-    };
+    };    
 
     return (
         <FormContainer>
