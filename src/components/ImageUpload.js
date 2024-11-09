@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { uploadImage } from "../api";  
+import { uploadImage } from "../api"; 
 
 const ImageUpload = ({ token }) => {
     const [file, setFile] = useState(null);
@@ -34,9 +34,9 @@ const ImageUpload = ({ token }) => {
             for (let [key, value] of formData.entries()) {
                 console.log(`${key}:`, value);
             }
-    
-            const response = await uploadImage(formData);  
-    
+
+            const response = await uploadImage(formData, token);  
+
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
                 setTags(response.data.tags); 
