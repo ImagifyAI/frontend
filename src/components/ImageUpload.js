@@ -21,8 +21,6 @@ const ImageUpload = ({ token }) => {
             formData.append("image", file);
     
             const decodedToken = JSON.parse(atob(token.split('.')[1])); 
-            console.log("Decoded Token:", decodedToken);  
-            
             const userId = decodedToken.sub;  
     
             if (!userId) {
@@ -32,13 +30,13 @@ const ImageUpload = ({ token }) => {
     
             formData.append("userId", userId);  
     
-            console.log("Decoded userId:", userId);
-    
+            console.log("FormData content:", formData);
+
             const response = await uploadImage(token, formData);
     
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
-                setTags(response.data.tags);  
+                setTags(response.data.tags); 
             } else {
                 setStatusMessage("Image upload failed");
             }
@@ -47,7 +45,6 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
-    
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
