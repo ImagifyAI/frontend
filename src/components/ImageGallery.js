@@ -20,11 +20,11 @@ const ImageGallery = ({ token }) => {
                 if (response.data.success && Array.isArray(response.data.images)) {
                     setImages(response.data.images);
                 } else {
-                    setError("Failed to load images.");
+                    setError("Failed to load images");
                 }
             } catch (error) {
                 console.error("Failed to load images:", error);
-                setError("An error occurred while fetching images.");
+                setError("An error occurred while fetching images");
             }
         };
 
