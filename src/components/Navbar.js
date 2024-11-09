@@ -35,7 +35,7 @@ const Nav = styled.nav`
   }
 `;
 
-const Navbar = ({ token }) => {
+const Navbar = ({ token, onLogout }) => {
     const navigate = useNavigate();
 
     const handleGalleryClick = () => {
@@ -46,13 +46,24 @@ const Navbar = ({ token }) => {
         }
     };
 
+    const handleLogoutClick = () => {
+        onLogout(); 
+        navigate("/"); 
+    };
+
     return (
         <Nav>
             <h1 onClick={() => navigate("/")}>ImagifyAI</h1>
             <div>
                 <button onClick={handleGalleryClick}>Gallery</button>
-                <Link to="/login">Login</Link>
-                <Link to="/register">Register</Link>
+                {token ? (
+                    <button onClick={handleLogoutClick}>Logout</button>
+                ) : (
+                    <>
+                        <Link to="/login">Login</Link>
+                        <Link to="/register">Register</Link>
+                    </>
+                )}
             </div>
         </Nav>
     );
