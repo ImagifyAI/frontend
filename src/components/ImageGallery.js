@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { getImages, searchImages } from "../api"; 
 import styled from "styled-components";
 
@@ -68,11 +68,7 @@ const ImageGallery = ({ token }) => {
     const [selectedImage, setSelectedImage] = useState(null);
     const [query, setQuery] = useState(""); 
 
-    useEffect(() => {
-        fetchImages();
-    }, [token]);
-
-    const fetchImages = async () => {
+    const fetchImages = useCallback(async () => {
         try {
             const response = await getImages(token);
             if (response.data.success && Array.isArray(response.data.images)) {
@@ -84,7 +80,11 @@ const ImageGallery = ({ token }) => {
             console.error("Failed to load images:", error);
             setError("An error occurred while fetching images");
         }
-    };
+    }, [token]);
+
+    useEffect(() => {
+        fetchImages();
+    }, [fetchImages]);
 
     const handleImageClick = (image) => {
         setSelectedImage(image); 
