@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { login, register } from "../api";
+import Turnstile from "react-turnstile"; // Import Turnstile
 
 const FormContainer = styled.div`
   /* Styles */
@@ -11,56 +12,55 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+    const [turnstileToken, setTurnstileToken] = useState(""); 
     const navigate = useNavigate();
+
+    const handleTurnstileChange = (token) => {
+        setTurnstileToken(token);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
+        if (!turnstileToken) { 
+            setError("Please complete the captcha.");
+            return;
+        }
 
-        try {
-            let response;
-            if (isLogin) {
-                response = await login(email, password);
-                if (response.data.success) {
-                    onLogin(response.data.token);
-                    navigate("/");
-                } else {
-                    setError("Invalid email or password");
-                }
-            } else {
-                response = await register(email, password);
-                if (response.data.success) {
-                    navigate("/login");
-                } else {
-                    setError("Registration failed");
-                }
-            }
-        } catch (error) {
-            setError(isLogin ? "Login failed, please check your credentials" : "Registration failed, please try again");
+        const headers = { 'Content-Type': 'application/json', 'Turnstile-Token': turnstileToken };
+        const response = await (isLogin ? login : register)({ email, password }, headers);
+
+        if (response.success) {
+            onLogin();
+            navigate("/"); 
+        } else {
+            setError(response.error || "Authentication failed");
         }
     };
 
     return (
         <FormContainer>
-            <h2>{title}</h2>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
+                <input 
+                    type="email" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    placeholder="Email" 
+                    required 
                 />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
+                <input 
+                    type="password" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    placeholder="Password" 
+                    required 
+                />
+                <Turnstile 
+                    sitekey="YOUR_TURNSTILE_SITE_KEY" 
+                    onVerify={handleTurnstileChange} 
                 />
                 <button type="submit">{title}</button>
             </form>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+            {error && <p>{error}</p>}
         </FormContainer>
     );
 };
