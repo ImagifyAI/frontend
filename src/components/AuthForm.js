@@ -22,14 +22,16 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!turnstileToken) { 
-            setError("Please complete the captcha.");
+            setError("Please complete the captcha");
             return;
         }
     
         const headers = { 'Turnstile-Token': turnstileToken };
-        console.log(turnstileToken);
+        console.log("Turnstile Token:", turnstileToken); 
+    
         try {
             const response = await register(email, password, headers);
+            console.log("Backend response:", response.data); 
             if (response.data.success) {
                 onLogin();
                 navigate("/"); 
@@ -37,6 +39,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                 setError(response.data.error || "Authentication failed");
             }
         } catch (error) {
+            console.error("Registration error:", error); 
             setError("Registration failed");
         }
     };    
