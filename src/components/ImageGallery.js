@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getImages } from "../api";
+import { getImages, searchImages } from "../api"; 
 import styled from "styled-components";
 
 const GalleryGrid = styled.div`
@@ -40,7 +40,7 @@ const ModalContent = styled.div`
 const FullImage = styled.img`
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain;  
+  object-fit: contain;
   border-radius: 8px;
 `;
 
@@ -66,24 +66,25 @@ const ImageGallery = ({ token }) => {
     const [images, setImages] = useState([]);
     const [error, setError] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [query, setQuery] = useState(""); 
 
     useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const response = await getImages(token);
-                if (response.data.success && Array.isArray(response.data.images)) {
-                    setImages(response.data.images);
-                } else {
-                    setError("Failed to load images");
-                }
-            } catch (error) {
-                console.error("Failed to load images:", error);
-                setError("An error occurred while fetching images");
-            }
-        };
-
         fetchImages();
     }, [token]);
+
+    const fetchImages = async () => {
+        try {
+            const response = await getImages(token);
+            if (response.data.success && Array.isArray(response.data.images)) {
+                setImages(response.data.images);
+            } else {
+                setError("Failed to load images");
+            }
+        } catch (error) {
+            console.error("Failed to load images:", error);
+            setError("An error occurred while fetching images");
+        }
+    };
 
     const handleImageClick = (image) => {
         setSelectedImage(image); 
@@ -95,11 +96,25 @@ const ImageGallery = ({ token }) => {
         link.download = filename;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link); 
+        document.body.removeChild(link);
     };
 
     const closeModal = () => {
         setSelectedImage(null);
+    };
+
+    const handleSearch = async () => {
+        try {
+            const response = await searchImages(token, query); 
+            if (response.data.success) {
+                setImages(response.data.images);
+            } else {
+                setError("No results found for this tag.");
+            }
+        } catch (error) {
+            console.error("Search failed:", error);
+            setError("An error occurred while searching images.");
+        }
     };
 
     if (error) {
@@ -109,6 +124,13 @@ const ImageGallery = ({ token }) => {
     return (
         <div>
             <h2>Your Gallery</h2>
+            <input
+                type="text"
+                placeholder="Search by tag"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+            />
+            <button onClick={handleSearch}>Search</button>
             <GalleryGrid>
                 {images.map((image) => (
                     <img
