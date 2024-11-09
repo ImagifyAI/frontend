@@ -20,7 +20,7 @@ const ImageUpload = ({ token }) => {
             const formData = new FormData();
             formData.append("image", file);
     
-            const decodedToken = JSON.parse(atob(token.split('.')[1]));  
+            const decodedToken = JSON.parse(atob(token.split('.')[1])); 
             const userId = decodedToken.sub;  
     
             formData.append("userId", userId); 
@@ -37,7 +37,7 @@ const ImageUpload = ({ token }) => {
             console.error("Upload failed:", error);
             setStatusMessage("An error occurred during upload");
         }
-    };    
+    };       
     
 
     return (
