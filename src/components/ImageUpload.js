@@ -10,18 +10,22 @@ const ImageUpload = ({ token }) => {
         e.preventDefault();
         setStatusMessage("");
         setTags([]); 
-
+    
         if (!file) {
             setStatusMessage("Please select a file to upload");
             return;
         }
-
+    
         try {
             const formData = new FormData();
             formData.append("image", file);
-
-            const response = await uploadImage(token, formData.get("image"));
-
+            
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));  
+            const userId = decodedToken.sub;  
+            formData.append("userId", userId); 
+    
+            const response = await uploadImage(token, formData);
+    
             if (response.data.success) {
                 setStatusMessage("Image uploaded successfully");
                 setTags(response.data.tags); 
@@ -33,6 +37,7 @@ const ImageUpload = ({ token }) => {
             setStatusMessage("An error occurred during upload");
         }
     };
+    
 
     return (
         <div style={{ textAlign: "center", paddingTop: "20px" }}>
