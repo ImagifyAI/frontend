@@ -9,8 +9,12 @@ export const register = (email, password, headers = {}) =>
         { headers } 
     );
 
-export const login = (email, password) => 
-    axios.post(`${API_URL}/login`, { email, password });
+    export const login = (email, password, headers = {}) => 
+        axios.post(
+            `${API_URL}/login`, 
+            { email, password }, 
+            { headers } 
+        );
 
 export const uploadImage = async (formData, token) => {
     try {
