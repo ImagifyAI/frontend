@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { login, register } from "../api";
-import Turnstile from "react-turnstile"; // Import Turnstile
+import Turnstile from "react-turnstile"; 
 
 const FormContainer = styled.div`
   /* Styles */
@@ -55,7 +55,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     required 
                 />
                 <Turnstile 
-                    sitekey="YOUR_TURNSTILE_SITE_KEY" 
+                    sitekey="0x4AAAAAAAznBW2ZnF8X7Wc5" 
                     onVerify={handleTurnstileChange} 
                 />
                 <button type="submit">{title}</button>
