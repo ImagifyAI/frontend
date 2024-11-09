@@ -9,17 +9,19 @@ export const register = (email, password, headers = {}) =>
         { headers } 
     );
 
-    export const login = (email, password, headers = {}) => 
-        axios.post(
-            `${API_URL}/login`, 
-            { email, password }, 
-            { headers } 
-        );
+export const login = (email, password, headers = {}) => 
+    axios.post(
+        `${API_URL}/login`, 
+        { email, password }, 
+        { headers } 
+    );
 
-export const uploadImage = async (formData, token) => {
+
+export const uploadImage = async (formData) => {
+    const token = localStorage.getItem("authToken"); 
     try {
         const response = await axios.post(
-            "https://backend.lokesh.cloud/api/upload", 
+            `${API_URL}/upload`, 
             formData,
             {
                 headers: {
@@ -35,13 +37,15 @@ export const uploadImage = async (formData, token) => {
     }
 };
 
-
-export const getImages = (token) => 
-    axios.get(`${API_URL}/images`, {
+export const getImages = () => {
+    const token = localStorage.getItem("authToken");
+    return axios.get(`${API_URL}/images`, {
         headers: { Authorization: `Bearer ${token}` },
     });
+};
 
-export const searchImages = (token, query) => {
+export const searchImages = (query) => {
+    const token = localStorage.getItem("authToken"); 
     return axios.post(
         `${API_URL}/search`, 
         { query },

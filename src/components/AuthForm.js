@@ -36,6 +36,10 @@ const AuthForm = ({ title, isLogin, onLogin = () => {} }) => {
 
             console.log("Backend response:", response.data); 
             if (response.data.success) {
+                if (isLogin && response.data.token) {
+                    localStorage.setItem("authToken", response.data.token);
+                }
+
                 if (typeof onLogin === "function") { 
                     onLogin();
                 }
