@@ -18,20 +18,25 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         const script = document.createElement("script");
         script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
         script.async = true;
+        script.onload = () => {
+            if (window.turnstile) {
+                window.turnstile.render(`#turnstile-widget-${isLogin ? 'login' : 'register'}`, {
+                    sitekey: "0x4AAAAAAAznBW2ZnF8X7Wc5",
+                    callback: (token) => setTurnstileToken(token),
+                });
+            }
+        };
         document.body.appendChild(script);
 
-        window.onTurnstileLoad = () => {
-            window.turnstile.render('#turnstile-widget', {
-                sitekey: "0x4AAAAAAAznBW2ZnF8X7Wc5",
-                callback: (token) => setTurnstileToken(token),
-            });
+        return () => {
+            document.body.removeChild(script);
         };
-    }, []);
+    }, [isLogin]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!turnstileToken) {
-            setError("Please complete the turnstile challenge");
+            setError("Please complete the Turnstile challenge");
             return;
         }
 
@@ -49,9 +54,20 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         <FormContainer>
             <h2>{title}</h2>
             <form onSubmit={handleSubmit}>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                <div id="turnstile-widget"></div>
+                <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+                {/* Use unique IDs for each page to avoid conflict */}
+                <div id={`turnstile-widget-${isLogin ? 'login' : 'register'}`}></div>
                 {error && <p>{error}</p>}
                 <button type="submit">{title}</button>
             </form>
