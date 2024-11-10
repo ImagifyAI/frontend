@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { login, register } from "../api";
 
 const FormContainer = styled.div`
-    /* Styles */
+    /* Keep your existing styles */
 `;
 
 const TurnstileContainer = styled.div`
@@ -18,25 +18,41 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [turnstileLoaded, setTurnstileLoaded] = useState(false);
     const turnstileRef = useRef();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const script = document.createElement('script');
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+        if (!document.querySelector('script[src="https://challenges.cloudflare.com/turnstile/v0/api.js"]')) {
+            const script = document.createElement('script');
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
+            script.async = true;
+            script.defer = true;
+            
+            window.onTurnstileLoad = () => {
+                setTurnstileLoaded(true);
+            };
+
+            document.head.appendChild(script);
+        } else if (window.turnstile) {
+            setTurnstileLoaded(true);
+        }
 
         return () => {
-            const existingScript = document.querySelector(
-                'script[src="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
-            );
-            if (existingScript) {
-                document.head.removeChild(existingScript);
-            }
+            window.onTurnstileLoad = null;
         };
     }, []);
+
+    useEffect(() => {
+        if (turnstileLoaded && turnstileRef.current) {
+            window.turnstile.render(turnstileRef.current, {
+                sitekey: "0x4AAAAAAAznBW2ZnF8X7Wc5",
+                callback: function(token) {
+                    console.log("Turnstile token:", token);
+                }
+            });
+        }
+    }, [turnstileLoaded]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -44,20 +60,23 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         setIsLoading(true);
 
         try {
-            const turnstileToken = await new Promise((resolve) => {
-                turnstileRef.current.getTurnstileToken((token) => {
-                    resolve(token);
-                });
+            const token = await new Promise((resolve) => {
+                if (!window.turnstile) {
+                    resolve(null);
+                    return;
+                }
+                const tokens = window.turnstile.getResponse();
+                resolve(tokens ? tokens[0] : null);
             });
 
-            if (!turnstileToken) {
+            if (!token) {
                 setError("Please complete the security check");
                 setIsLoading(false);
                 return;
             }
 
             if (isLogin) {
-                const response = await login(email, password, turnstileToken);
+                const response = await login(email, password, token);
                 if (response.data.success) {
                     onLogin(response.data.token);
                     navigate("/");
@@ -65,7 +84,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     setError("Invalid email or password");
                 }
             } else {
-                const response = await register(email, password, turnstileToken);
+                const response = await register(email, password, token);
                 if (response.data.success) {
                     navigate("/login");
                 } else {
@@ -78,8 +97,8 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     ? "Login failed, please check your credentials" 
                     : "Registration failed, please try again"
             );
-            if (turnstileRef.current) {
-                window.turnstile.reset(turnstileRef.current);
+            if (window.turnstile) {
+                window.turnstile.reset();
             }
         } finally {
             setIsLoading(false);
@@ -105,21 +124,10 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     required
                 />
                 <TurnstileContainer>
-                    <div
-                        className="cf-turnstile"
-                        data-sitekey="0x4AAAAAAAznBW2ZnF8X7Wc5"
-                        data-callback="handleCallback"
-                        ref={(ref) => {
-                            turnstileRef.current = ref;
-                            if (ref && !ref.hasAttribute('data-loaded')) {
-                                ref.setAttribute('data-loaded', 'true');
-                                window.turnstile.render(ref);
-                            }
-                        }}
-                    />
+                    <div ref={turnstileRef} />
                 </TurnstileContainer>
                 <button type="submit" disabled={isLoading}>
-                    {isLoading ? "Please wait..." : title}
+                    {isLoading ? "Please wait" : title}
                 </button>
             </form>
             {error && <p style={{ color: "red" }}>{error}</p>}
