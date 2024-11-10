@@ -40,13 +40,21 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
             return;
         }
         console.log("Submitting with Turnstile token:", turnstileToken);
+    
         try {
             const apiFunc = isLogin ? login : register;
-            await apiFunc(email, password, turnstileToken);
-            navigate("/");
-            onLogin && onLogin();
+            const response = await apiFunc(email, password, turnstileToken);
+    
+            const authToken = response.data.token;
+            if (authToken) {
+                localStorage.setItem("authToken", authToken);
+                navigate("/");
+                onLogin && onLogin();
+            } else {
+                setError("Authentication token not received.");
+            }
         } catch (error) {
-            setError("Login or registration failed");
+            setError("Login or registration failed.");
         }
     };
 
