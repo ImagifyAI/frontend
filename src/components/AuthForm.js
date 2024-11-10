@@ -107,7 +107,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                 <TurnstileContainer>
                     <div
                         className="cf-turnstile"
-                        data-sitekey="YOUR_TURNSTILE_SITE_KEY"
+                        data-sitekey="0x4AAAAAAAznBW2ZnF8X7Wc5"
                         data-callback="handleCallback"
                         ref={(ref) => {
                             turnstileRef.current = ref;
