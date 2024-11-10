@@ -39,7 +39,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
             setError("Please complete the Turnstile challenge");
             return;
         }
-
+        console.log("Submitting with Turnstile token:", turnstileToken);
         try {
             const apiFunc = isLogin ? login : register;
             await apiFunc({ email, password, turnstileToken });
