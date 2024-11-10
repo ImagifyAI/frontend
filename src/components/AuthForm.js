@@ -11,6 +11,7 @@ const TurnstileContainer = styled.div`
     margin: 20px 0;
     display: flex;
     justify-content: center;
+    min-height: 65px; /* Add minimum height to prevent layout shift */
 `;
 
 const AuthForm = ({ title, isLogin, onLogin }) => {
@@ -21,17 +22,11 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
     const [turnstileToken, setTurnstileToken] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const script = document.createElement('script');
-        script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?onload=onTurnstileLoad';
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-
-        window.onTurnstileLoad = () => {
+    const renderTurnstile = () => {
+        if (window.turnstile) {
             window.turnstile.render('#turnstile-widget', {
-                sitekey: 'YOUR_SITE_KEY',
-                callback: function(token) {
+                sitekey: '0x4AAAAAAAznBW2ZnF8X7Wc5',
+                callback: function (token) {
                     console.log("Turnstile token received");
                     setTurnstileToken(token);
                 },
@@ -44,18 +39,34 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     setTurnstileToken(null);
                 }
             });
-        };
+        }
+    };
+
+    useEffect(() => {
+        const existingScript = document.querySelector(
+            'script[src*="challenges.cloudflare.com/turnstile/v0/api.js"]'
+        );
+
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            script.async = true;
+            script.defer = true;
+            script.onload = () => {
+                console.log("Turnstile script loaded");
+                renderTurnstile();
+            };
+            document.head.appendChild(script);
+        } else {
+            renderTurnstile();
+        }
 
         return () => {
-            window.onTurnstileLoad = null;
-            const existingScript = document.querySelector(
-                'script[src*="challenges.cloudflare.com/turnstile/v0/api.js"]'
-            );
-            if (existingScript) {
-                document.head.removeChild(existingScript);
+            if (window.turnstile) {
+                window.turnstile.remove('#turnstile-widget');
             }
         };
-    }, []);
+    }, [isLogin]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -89,9 +100,9 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         } catch (error) {
             console.error("Request error:", error.response?.data || error);
             setError(
-                error.response?.data?.error || 
-                (isLogin 
-                    ? "Login failed, please check your credentials" 
+                error.response?.data?.error ||
+                (isLogin
+                    ? "Login failed, please check your credentials"
                     : "Registration failed, please try again")
             );
             if (window.turnstile) {
@@ -122,7 +133,10 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
                     required
                 />
                 <TurnstileContainer>
-                    <div id="turnstile-widget" />
+                    <div
+                        id="turnstile-widget"
+                        style={{ display: 'inline-block' }}
+                    />
                 </TurnstileContainer>
                 <button type="submit" disabled={isLoading}>
                     {isLoading ? "Please wait..." : title}
