@@ -42,7 +42,7 @@ const AuthForm = ({ title, isLogin, onLogin }) => {
         console.log("Submitting with Turnstile token:", turnstileToken);
         try {
             const apiFunc = isLogin ? login : register;
-            await apiFunc({ email, password, turnstileToken });
+            await apiFunc(email, password, turnstileToken);
             navigate("/");
             onLogin && onLogin();
         } catch (error) {
